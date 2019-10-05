@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -37,6 +38,7 @@ func (h RuvHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, ruvResponse.URL, 302)
+	fmt.Printf("Handed URL %s to %s\n", ruvResponse.URL, r.RemoteAddr)
 }
 
 func getRequest(url string) ([]byte, error) {
