@@ -25,7 +25,7 @@ func NewRuvHandler(url string) RuvHandler {
 
 func (h RuvHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	logging.LogRequest(r)
-	body, err := getRequest(h.URL)
+	body, err := getRequest(h.URL, r)
 	if err != nil {
 		w.WriteHeader(502)
 	}
@@ -41,10 +41,16 @@ func (h RuvHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Handed URL %s to %s\n", ruvResponse.URL, r.RemoteAddr)
 }
 
-func getRequest(url string) ([]byte, error) {
+func getRequest(url string, r *http.Request) ([]byte, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
+	}
+
+	// Pass on some headers from the requester
+	req.Header = http.Header{
+		"User-Agent": r.Header["User-Agent"],
+		"Accept":     r.Header["Accept"],
 	}
 
 	httpClient := &http.Client{Timeout: time.Second * 10}
